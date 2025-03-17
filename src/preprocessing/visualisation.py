@@ -2,8 +2,13 @@ import os
 import networkx as nx
 import matplotlib.pyplot as plt
 import matplotlib
+import pandas as pd
 matplotlib.use('TkAgg')  # or 'Agg' if running in a headless environment
 import numpy as np
+import graphviz
+from tqdm import tqdm
+import ast
+from PIL import Image
 
 def visualize_garimella_graph(graph_directory):
     """
@@ -75,3 +80,58 @@ def visualize_large_garimella_graph(graph_directory):
         plt.savefig(f"{graph_file}.png")
         plt.close()
 
+'''
+def visualize_vaccination_graph(gml_file):
+    if not os.path.exists(gml_file):
+        print(f"Error: File {gml_file} not found.")
+        return
+
+    # Load the graph
+    G = nx.read_gml(gml_file)
+
+    # Convert to AGraph for Graphviz visualization
+    A = nx.nx_agraph.to_agraph(G)
+
+    # Use the sfdp layout for visualization
+    A.layout(prog='sfdp')
+
+    # Output image file
+    output_file = gml_file.replace('.gml', '.png')
+    A.draw(output_file)
+
+    # Show the result
+    img = plt.imread(output_file)
+    plt.figure(figsize=(10, 10))
+    plt.imshow(img)
+    plt.axis('off')
+    plt.show()
+
+    print(f"Graph visualization saved as {output_file}")
+'''
+
+def visualize_vaccination_graph(gml_file):
+    if not os.path.exists(gml_file):
+        print(f"Error: File {gml_file} not found.")
+        return
+
+    # Load the graph
+    G = nx.read_gml(gml_file)
+
+    # Convert to pydot graph for Graphviz
+    P = nx.nx_pydot.to_pydot(G)
+
+    # Output image file
+    output_file = gml_file.replace('.gml', '.png')
+
+    # Use Graphviz's 'sfdp' layout and save as PNG
+    P.set_prog("sfdp")
+    P.write_png(output_file)
+
+    # Display the image
+    img = Image.open(output_file)
+    plt.figure(figsize=(10, 10))
+    plt.imshow(img)
+    plt.axis("off")
+    plt.show()
+
+    print(f"Graph visualization saved as {output_file}")

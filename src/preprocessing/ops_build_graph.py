@@ -132,7 +132,7 @@ def add_meta(path):
 ### VAX GRAPHS
 def vax_graph():
     starting_path = os.getcwd()
-    path = os.path.join(starting_path, 'data/vax_no_vax')
+    path = os.path.join(starting_path, 'data/vaccination')
 
     # Note: Same pattern here, if 'Graph' is missing, it will try to generate it
     if check_directory_absence('Graph', path):

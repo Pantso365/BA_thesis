@@ -118,7 +118,7 @@ def refine_data():
     starting_path = os.getcwd()
     # Note: Even though in the readme name is stated as 'vaccation' vax_no_vax is clearly needed
     # so renaming the directory is way to go
-    path = os.path.join(starting_path, 'data/vax_no_vax')
+    path = os.path.join(starting_path, 'data/vaccination')
 
     # Note: This is being run only once if the 'final_data' is not present, so to regenerate the 'final_data' delete
     # the directory
@@ -129,8 +129,9 @@ def refine_data():
         df = pd.read_csv('./master.csv', usecols=['date', 'username', 'replies_count', 'retweets_count',
                                                   'likes_count', 'hashtags', 'mentions', 'tweet'])
         os.chdir(os.path.join(path, 'final_data'))
-        df['mentions'].replace('[]', "['self']", inplace=True)
-        df['hashtags'].replace('[]', "['noOne']", inplace=True)
+        df.loc[df['mentions'] == '[]', 'mentions'] = "['self']"
+        df.loc[df['hashtags'] == '[]', 'hashtags'] = "['noOne']"
+
         df.to_csv('Final_data.csv', encoding='utf-8', index=False)
 
         print('VACCINATION DATA FINAL SHAPE')
