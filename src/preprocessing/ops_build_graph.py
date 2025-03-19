@@ -134,7 +134,6 @@ def vax_graph():
     starting_path = os.getcwd()
     path = os.path.join(starting_path, 'data/vaccination')
 
-    # Note: Same pattern here, if 'Graph' is missing, it will try to generate it
     if check_directory_absence('Graph', path):
         os.mkdir('Graph')
         os.chdir(os.path.join(path, 'final_data'))
@@ -144,6 +143,20 @@ def vax_graph():
 
     os.chdir(starting_path)
 
+
+def vax_graph():
+    starting_path = os.getcwd()
+    path = os.path.join(starting_path, 'data/vaccination')
+
+    # Note: Same pattern here, if 'Graph' is missing, it will try to generate it
+    if check_directory_absence('Graph', path):
+        os.mkdir('Graph')
+        os.chdir(os.path.join(path, 'final_data'))
+        build_vaccination_graph(path)
+    else:
+        print("Vax graph already built, skipping...")
+
+    os.chdir(starting_path)
 
 # Note: This takes couple of minutes (cca 5min on M3 Mac)
 def build_vaccination_graph(path):
@@ -176,3 +189,5 @@ def build_vaccination_graph(path):
 
     graphs = [G_dg, G_g]
     manage_and_save(graphs, path)
+
+

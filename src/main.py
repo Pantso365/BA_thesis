@@ -6,7 +6,7 @@ from preprocessing.visualisation import visualize_large_garimella_graph
 # from preprocessing.topic_modelling import add_topic
 # from controversy_detection.start_controversy_detection import start_detection
 # from link_prediction.start_link_prediction import start_link_opt
-
+import pydot
 
 import sys
 
@@ -38,3 +38,4 @@ if __name__ == '__main__':
    refine_data()
    vax_graph()
    visualize_vaccination_graph("C:/Users/panos/GitHub/echochambers/src/data/vaccination/Graph/Final_Graph_Vax.gml")
+
