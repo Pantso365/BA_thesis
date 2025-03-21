@@ -20,6 +20,7 @@ def graph_ops():
     vax_graph()
     # add_sentiment()
     # add_topic()
+    filter_high_weight_edges('./data/vaccination/Graph/Final_Graph_Vax.gml', 3)
 
 
 # Note: This one takes 'retweet_networks' and makes them into graphs
@@ -191,3 +192,25 @@ def build_vaccination_graph(path):
     manage_and_save(graphs, path)
 
 
+def filter_high_weight_edges(input_gml_path, min_weight=3):
+    """
+    Loads a graph from a GML file, filters edges with weight >= min_weight,
+    and saves the resulting graph to a new GML file.
+
+    :param input_gml_path: Path to the input GML file (Final Graph)
+    :param min_weight: Minimum edge weight to filter (default is 3)
+    """
+    # Load the graph from GML file
+    G = nx.read_gml(input_gml_path)
+
+    # Create a new graph containing only edges with weight >= min_weight
+    filtered_G = G.__class__()  # Preserve graph type (Graph or DiGraph)
+    filtered_G.add_nodes_from(G.nodes(data=True))  # Copy nodes to maintain structure
+    filtered_G.name = "Filtered_vax_graph"
+
+    for u, v, data in G.edges(data=True):
+        if data.get("weight", 0) >= min_weight:
+            filtered_G.add_edge(u, v, **data)
+
+    starting_path = os.getcwd()
+    manage_and_save([filtered_G], os.path.join(starting_path, 'data/vaccination'))
