@@ -14,9 +14,9 @@ import time
 
 
 def graph_ops():
-    garimella_graph()
+    # garimella_graph()
     # Note: No covid dataset so we can skip this
-    # covid_graph()
+    covid_graph()
     # vax_graph()
     # add_sentiment()
     # add_topic()
@@ -72,7 +72,7 @@ def covid_graph():
     path = os.path.join(starting_path, 'data/corona_virus')
     meta = False
     if check_directory_absence('Graph', path):
-        os.mkdir('Graph')
+        os.mkdir(os.path.join(path, 'Graph'))
         os.chdir(os.path.join(path, 'final_data'))
         build_covid_graph(path)
         meta = True
@@ -81,39 +81,43 @@ def covid_graph():
     print('---------------------------------------')
     os.chdir(starting_path)
 
-
 def build_covid_graph(path):
-    df = pd.read_csv(path + '/final_data/' + 'Final_data.csv', usecols=['username', 'favorites', 'retweets',
-                                                                        '@mentions', 'geo', 'text_con_hashtag'])
+    df = pd.read_csv(os.path.join(path, 'final_data', 'Final_data.csv'),
+                     usecols=['original_author', 'favorite_count', 'retweet_count', 'user_mentions', 'original_text'])
     print(df.columns)
-    df.dropna(axis='index', how='all', subset=['text_con_hashtag'], inplace=True)
+    df.dropna(axis='index', how='all', subset=['original_text'], inplace=True)
 
     G_dg = nx.DiGraph()
     G_g = nx.Graph()
 
     for _, row in tqdm(df.iterrows(), desc="Rows processed"):
-        if row[4] == 'self' and row[4] != '':
-            G_dg = add_edge(G_dg, row[5], 'covid', row[0], row[2], 0, row[3], row[3])
+        if row['user_mentions'] == "['self']" or row['user_mentions'] == '':
+            G_dg = add_edge(G_dg, row['original_text'], 'twitter', row['original_author'], row['retweet_count'], 0, row['favorite_count'], row['favorite_count'])
         else:
             try:
-                mentions = row[4].split(',')
+                mentions = row['user_mentions'].split(',')
+                mentions = [mention.strip() for mention in mentions if mention.strip()]
                 for mention in mentions:
                     mention = mention.strip()
-                    if mention != '' and mention != '@':
-                        G_dg = add_edge(G_dg, row[5], 'covid', row[0], row[2], 0, row[3], mention)
-                        G_g = add_edge(G_g, None, None, None, None, None, row[3], mention)
+                    if mention:
+                        G_dg = add_edge(G_dg, row['original_text'], 'twitter', row['original_author'], row['retweet_count'], 0, row['favorite_count'], mention)
+                        G_g = add_edge(G_g, None, None, None, None, None, row['favorite_count'], mention)
             except:
-                print(row[4])
+                print(row['user_mentions'])
 
-    G_dg.name = 'Starter covid Direct Graph'
-    G_g.name = 'Starter covid Graph'
+    G_dg.name = 'Starter Twitter Direct Graph'
+    G_g.name = 'Starter Twitter Graph'
 
     graphs = [G_dg, G_g]
     manage_and_save(graphs, path)
 
 
 def add_meta(path):
-    G = nx.read_gml('./Graph/Final_DiGraph_Covid.gml')
+    graph_path = os.path.join(path, 'Graph', 'Final_DiGraph_Covid.gml')
+    if not os.path.exists(graph_path):
+        raise FileNotFoundError(f"Graph file not found: {graph_path}")
+    G = nx.read_gml(graph_path)
+
     user_metadata_clean = get_metadata()
 
     not_included = 0

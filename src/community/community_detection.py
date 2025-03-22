@@ -14,7 +14,7 @@ def start_community_detection():
     logging.info(f'RUN TIME: {today}')
 
 
-    #garimella_graph()
+    garimella_graph()
     # Note: We don't have covid dataset
     # covid_graph()
     vax_graph()
@@ -63,7 +63,7 @@ def covid_graph():
 
 def vax_graph():
     starting_path = os.getcwd()
-    path = os.path.join(starting_path, 'data/vaccination/Graph')
+    path = os.path.join(stFinarting_path, 'data/vaccination/Graph')
     os.chdir(path)             
     log_write_start_end(True, 'VACCINATION GRAPH')
 

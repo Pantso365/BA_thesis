@@ -12,8 +12,9 @@ def check_directory_absence(name, path):
 
 
 def ops_on_corona():
-    group_by_month_corona()
-    extract_only_en()
+    # group_by_month_corona()
+    # extract_only_en()
+    refine_covid_data()
 
 
 def group_by_month_corona():
@@ -140,3 +141,31 @@ def refine_data():
         print("Vaccination data preprocessing skipped, as it already exists...")
 
     os.chdir(starting_path)
+
+
+def refine_covid_data():
+    starting_path = os.getcwd()
+    path = os.path.join(starting_path, 'data/corona_virus')
+
+    if check_directory_absence('final_data', path):
+        os.mkdir(os.path.join(path, 'final_data'))
+        os.chdir(os.path.join(path, 'raw_data'))
+
+        # Load dataset while keeping necessary columns
+        df = pd.read_csv('./Covid_Twitter_with_VADER.csv', usecols=['created_at', 'original_author', 'retweet_count', 'favorite_count',
+                                                  'hashtags', 'user_mentions', 'original_text', 'vader_compound'])
+        os.chdir(os.path.join(path, 'final_data'))
+
+        # Handle empty mentions and hashtags
+        df.loc[df['user_mentions'].isna() | (df['user_mentions'] == '[]'), 'user_mentions'] = "['self']"
+        df.loc[df['hashtags'].isna() | (df['hashtags'] == '[]'), 'hashtags'] = "['noOne']"
+
+        df.to_csv('Final_data.csv', encoding='utf-8', index=False)
+
+        print('TWITTER NEW DATA FINAL SHAPE')
+        print(df.shape)
+    else:
+        print("Twitter new data preprocessing skipped, as it already exists...")
+
+    os.chdir(starting_path)
+
