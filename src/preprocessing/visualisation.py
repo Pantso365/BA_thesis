@@ -38,7 +38,7 @@ def visualize_garimella_graph(graph_directory):
             print(
                 f"Graph {graph_file} is too large ({len(G.nodes)} nodes). Using a spring layout with reduced node visibility.")
             pos = nx.spring_layout(G, k=5 / np.sqrt(len(G.nodes)), seed=42)
-            nx.draw(G, pos, node_size=10, edge_color='gray', alpha=0.5, with_labels=False)
+            nx.draw(G, pos, node_size=0.1, edge_color='gray', alpha=0.5, with_labels=False)
         else:
             pos = nx.spring_layout(G)
             nx.draw(G, pos, with_labels=True, node_size=50, font_size=8, edge_color='gray')
@@ -255,3 +255,39 @@ def force_atlas2_layout(graph, atlas_properties):
     print("Force Atlas done")
     return dict(zip(graph, pos))
 '''
+
+def visualize_covid_graph(graph_directory):
+    """
+    Visualizes the COVID-19 related graphs stored as .gml files in the given directory, optimized for large graphs.
+
+    Parameters:
+    graph_directory (str): Path to the directory containing .gml graph files related to COVID-19.
+    """
+    if not os.path.exists(graph_directory):
+        print(f"Directory '{graph_directory}' does not exist.")
+        return
+
+    # Get all .gml files in the specified directory
+    graph_files = [f for f in os.listdir(graph_directory) if f.endswith('.gml')]
+
+    if not graph_files:
+        print("No .gml files found in the directory.")
+        return
+
+    for graph_file in graph_files:
+        graph_path = os.path.join(graph_directory, graph_file)
+        G = nx.read_gml(graph_path)
+
+        plt.figure(figsize=(10, 8))
+        plt.title(f"Visualization of {graph_file}")
+
+        # Check the graph size and adjust layout accordingly
+        if len(G.nodes) > 1000:
+            print(f"Graph {graph_file} is too large ({len(G.nodes)} nodes). Using spring layout with reduced node visibility.")
+            pos = nx.spring_layout(G, k=5 / np.sqrt(len(G.nodes)), seed=42, weight='weight')
+            nx.draw(G, pos, node_size=0.5, edge_color='gray', alpha=0.5, with_labels=False)
+        else:
+            pos = nx.spring_layout(G)
+            nx.draw(G, pos, with_labels=True, node_size=50, font_size=8, edge_color='gray')
+
+        plt.show()

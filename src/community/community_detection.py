@@ -14,10 +14,9 @@ def start_community_detection():
     logging.info(f'RUN TIME: {today}')
 
 
-    garimella_graph()
-    # Note: We don't have covid dataset
-    # covid_graph()
-    vax_graph()
+    # garimella_graph()
+    covid_graph()
+    # vax_graph()
 
 def garimella_graph():
     logging.basicConfig(filename='community_log.log', level=logging.INFO, format='%(message)s')
@@ -43,17 +42,20 @@ def garimella_graph():
 def covid_graph():
     starting_path = os.getcwd()
     path = os.path.join(starting_path, 'data/corona_virus/Graph')
-    os.chdir(path)             
+    os.chdir(path)
+
     log_write_start_end(True, 'COVID-19 GRAPH')
 
+    # Community detection with the correct weights
     info_no_sent_metis, info_no_sent_fluid = community_detection('Covid', 1, 'weight')
     info_sent_metis, info_sent_fluid = community_detection('Covid', 1, 'sentiment')
-    info_topic_metis, info_topic_fluid = community_detection('Covid', 1, 'topic')
-    info_hybrid_metis, info_hybrid_fluid = community_detection('Covid', 1, 'hybrid')
+    # info_topic_metis, info_topic_fluid = community_detection('Covid', 1, 'topic')
+    # info_hybrid_metis, info_hybrid_fluid = community_detection('Covid', 1, 'hybrid')
 
-    note_difference(info_no_sent_metis, info_sent_metis, 'Metis', 'sentiment')
-    note_difference(info_no_sent_metis, info_topic_metis, 'Metis', 'topic')
-    note_difference(info_no_sent_metis, info_hybrid_metis, 'Metis', 'hybrid')
+    # Log the difference between communities detected with and without sentiment
+    note_difference(info_no_sent_metis, info_sent_metis, 'Kernighan-Lin', 'sentiment')
+    # note_difference(info_no_sent_metis, info_topic_metis, 'Kernighan-Lin', 'topic')
+    # note_difference(info_no_sent_metis, info_hybrid_metis, 'Kernighan-Lin', 'hybrid')
 
     # note_difference(info_no_sent_fluid, info_sent_fluid, 'Fluid')
 
@@ -63,7 +65,7 @@ def covid_graph():
 
 def vax_graph():
     starting_path = os.getcwd()
-    path = os.path.join(stFinarting_path, 'data/vaccination/Graph')
+    path = os.path.join(starting_path, 'data/vaccination/Graph')
     os.chdir(path)             
     log_write_start_end(True, 'VACCINATION GRAPH')
 

@@ -92,7 +92,7 @@ def build_covid_graph(path):
 
     for _, row in tqdm(df.iterrows(), desc="Rows processed"):
         if row['user_mentions'] == "['self']" or row['user_mentions'] == '':
-            G_dg = add_edge(G_dg, row['original_text'], 'twitter', row['original_author'], row['retweet_count'], 0, row['favorite_count'], row['favorite_count'])
+            G_dg = add_edge(G_dg, row['original_text'], 'twitter', row['favorite_count'] , row['retweet_count'], 0, row['original_author'], row['original_author'])
         else:
             try:
                 mentions = row['user_mentions'].split(',')
@@ -100,8 +100,8 @@ def build_covid_graph(path):
                 for mention in mentions:
                     mention = mention.strip()
                     if mention:
-                        G_dg = add_edge(G_dg, row['original_text'], 'twitter', row['original_author'], row['retweet_count'], 0, row['favorite_count'], mention)
-                        G_g = add_edge(G_g, None, None, None, None, None, row['favorite_count'], mention)
+                        G_dg = add_edge(G_dg, row['original_text'], 'twitter', row['favorite_count'], row['retweet_count'], 0, row['original_author'], mention)
+                        G_g = add_edge(G_g, None, None, None, None, None, row['original_author'], mention)
             except:
                 print(row['user_mentions'])
 

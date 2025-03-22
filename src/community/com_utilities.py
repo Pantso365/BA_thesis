@@ -22,32 +22,6 @@ def create_multi_graph(G):
     return G_multi
 
 
-def modularity(partition, graph, weight='weight'):
-    if graph.is_directed():
-        raise TypeError("Bad graph type, use only non directed graph")
-
-    inc = dict([])
-    deg = dict([])
-    links = graph.size(weight=weight)
-    if links == 0:
-        raise ValueError("A graph without link has an undefined modularity")
-
-    for node in graph:
-        com = partition[node]
-        deg[com] = deg.get(com, 0.) + graph.degree(node, weight=weight)
-        for neighbor, datas in graph[node].items():
-            edge_weight = datas.get(weight, 1)
-            if partition[neighbor] == com:
-                if neighbor == node:
-                    inc[com] = inc.get(com, 0.) + float(edge_weight)
-                else:
-                    inc[com] = inc.get(com, 0.) + float(edge_weight) / 2.
-
-    res = 0.
-    for com in set(partition.values()):
-        res += (inc.get(com, 0.) / links) - \
-               (deg.get(com, 0.) / (2. * links)) ** 2
-    return res
 
 def get_community_dict_and_set(list_com):
     '''
@@ -79,27 +53,40 @@ def get_communities(G, alg, typology, seed=0):
     else:
         weight = 'weight'
 
-    if alg != 'Kernighan-Lin':
+    if alg == 'Louvain':
+        start = time.time()
+        communities = nx.community.louvain_communities(G, weight=weight, seed=seed, resolution=1.0)
+        end = time.time()
+
+        # Map nodes to their community
+        list_com = {node: i for i, com in enumerate(communities) for node in com}
+        set_com = set(list_com.values())  # Unique community labels
+
+        print(f'Number of communities detected: {len(communities)}')
+
+        info = [len(com) for com in communities]  # List of community sizes
+    elif alg == 'Kernighan-Lin':
+        start = time.time()
+
+        # Apply Kernighan-Lin bisection to split into exactly 2 communities
+        partition_A, partition_B = nx.community.kernighan_lin_bisection(G, weight=weight)
+
+        end = time.time()
+
+        # Combine the two partitions into a list of communities
+        partitions = [set(partition_A), set(partition_B)]
+
+        # Map nodes to their selected community
+        list_com = {node: i for i, com in enumerate(partitions) for node in com}
+        set_com = set(list_com.values())  # Unique community labels
+        info = [len(com) for com in partitions]  # Community sizes
+    else:
         print('Wrong algorithm name')
-        return -1, -1, -1, -1
-
-    start = time.time()
-
-    # Apply Kernighan-Lin bisection to split into exactly 2 communities
-    partition_A, partition_B = nx.community.kernighan_lin_bisection(G, weight=weight)
-
-    end = time.time()
-
-    # Combine the two partitions into a list of communities
-    partitions = [set(partition_A), set(partition_B)]
-
-    # Map nodes to their selected community
-    list_com = {node: i for i, com in enumerate(partitions) for node in com}
-    set_com = set(list_com.values())  # Unique community labels
-    info = [len(com) for com in partitions]  # Community sizes
-
-
+        set_com = -1
+        list_com = -1
+        info = -1
     return list_com, set_com, info, end - start
+
 
 def label_node_communities(compactGraph, communities, type_com, name, opt):
 
@@ -193,12 +180,12 @@ def community_detection(name, opt, typology):
 
     #### METIS (Replaced with Louvain)
     list_com_metis, set_com_metis, info, exe_time = get_communities(graph, 'Kernighan-Lin', typology)
-    mod_m = modularity(list_com_metis, graph, weight='weight')
+
 
     partition = []
     for community_id in set_com_metis:
         partition.append({node for node, com in list_com_metis.items() if com == community_id})
-
+    mod_m = nx.community.modularity(graph, partition)
     cov_m = partition_quality(graph, partition)[0] #extract only coverage [0] leave out performance [1]
 
     log_write_com_result('Kernighan-Lin', info, mod_m, cov_m, exe_time, opt, typology, name)
