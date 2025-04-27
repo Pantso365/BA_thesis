@@ -115,30 +115,26 @@ def nodes_management(G, option, threshold=0):
         return -1
 
 
-def add_edge(G, tweet, hashtag, likes, retweets, replies, source, destination):
+def add_edge(G, tweet, hashtag, favorites, retweets, source, destination, toxicity):
     source = clean(source)
     destination = clean(destination)
 
     if type(G).__name__ == 'DiGraph':
         if G.has_edge(source, destination):
             G[source][destination]['tweets'].append(tweet)
-            G[source][destination]['likes'].append(likes)
+            G[source][destination]['favorites'].append(favorites)
             G[source][destination]['retweets'].append(retweets)
             G[source][destination]['weight'] += 1.0
-            if hashtag != 'covid':
-                G[source][destination]['hashtags'].append(hashtag)
-                G[source][destination]['replies'].append(replies)
+            G[source][destination]['hashtags'].append(hashtag)
+            G[source][destination]['toxicities'].append(toxicity)
         else:
-            if hashtag == 'covid':
-                G.add_edge(source, destination, tweets=[tweet], likes=[likes], retweets=[retweets], weight=1.0)
-            else:
-                G.add_edge(source, destination, tweets=[tweet], hashtags=[hashtag], likes=[likes],
-                           retweets=[retweets], replies=[replies], weight=1.0)
+            G.add_edge(source, destination, tweets=[tweet], hashtags=[hashtag], favorites=[favorites],
+                       retweets=[retweets], toxicity=[toxicity], weight=1.0)
     else:
         if G.has_edge(source, destination):
             G[source][destination]['weight'] += 1.0
         else:
-            G.add_edge(source, destination, weight=1.0)
+            G.add_edge(source, destination, weight=1.0, toxicity=1)
     return G
 
 

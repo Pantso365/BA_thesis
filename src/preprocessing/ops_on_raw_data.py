@@ -152,8 +152,9 @@ def refine_covid_data():
         os.chdir(os.path.join(path, 'raw_data'))
 
         # Load dataset while keeping necessary columns
-        df = pd.read_csv('./Covid_Twitter_with_VADER.csv', usecols=['created_at', 'original_author', 'retweet_count', 'favorite_count',
-                                                  'hashtags', 'user_mentions', 'original_text', 'vader_compound'])
+        df = pd.read_csv('./Covid_Twitter_with_Toxicity.csv', usecols=['created_at', 'original_author', 'retweet_count',
+                                                                       'favorite_count', 'hashtags', 'user_mentions',
+                                                                       'original_text', 'vader_compound', 'toxicity'])
         os.chdir(os.path.join(path, 'final_data'))
 
         # Handle empty mentions and hashtags
@@ -168,4 +169,3 @@ def refine_covid_data():
         print("Twitter new data preprocessing skipped, as it already exists...")
 
     os.chdir(starting_path)
-
