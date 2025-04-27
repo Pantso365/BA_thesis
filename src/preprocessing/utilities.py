@@ -131,7 +131,7 @@ def add_edge(G, tweet, hashtag, favorites, retweets, source, destination, toxici
             G.add_edge(source, destination, tweets=[tweet], hashtags=[hashtag], favorites=[favorites],
                        retweets=[retweets], toxicity=[toxicity], weight=1.0)
     else:
-        if G.has_edge(source, destination):
+        if G.has_edge(source, destination, toxicity):
             G[source][destination]['weight'] += 1.0
             G[source][destination]['toxicity'] += toxicity
         else:

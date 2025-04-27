@@ -83,7 +83,8 @@ def covid_graph():
 
 def build_covid_graph(path):
     df = pd.read_csv(os.path.join(path, 'final_data', 'Final_data.csv'),
-                     usecols=['original_author', 'favorite_count', 'retweet_count', 'user_mentions', 'original_text'])
+                     usecols=['original_author', 'favorite_count', 'retweet_count', 'user_mentions', 'original_text',
+                              'hashtags', 'source', 'toxicity', 'vader_compound'])
     print(df.columns)
     df.dropna(axis='index', how='all', subset=['original_text'], inplace=True)
 
@@ -92,7 +93,8 @@ def build_covid_graph(path):
 
     for _, row in tqdm(df.iterrows(), desc="Rows processed"):
         if row['user_mentions'] == "['self']" or row['user_mentions'] == '':
-            G_dg = add_edge(G_dg, row['original_text'], 'twitter', row['favorite_count'] , row['retweet_count'], 0, row['original_author'], row['original_author'])
+            G_dg = add_edge(G_dg, row['original_text'], row['hashtags'], row['favorite_count'], row['retweet_count'],
+                            row['original_python'], row['original_author'], row['toxicity'])
         else:
             try:
                 mentions = row['user_mentions'].split(',')
@@ -100,8 +102,10 @@ def build_covid_graph(path):
                 for mention in mentions:
                     mention = mention.strip()
                     if mention:
-                        G_dg = add_edge(G_dg, row['original_text'], 'twitter', row['favorite_count'], row['retweet_count'], 0, row['original_author'], mention)
-                        G_g = add_edge(G_g, None, None, None, None, None, row['original_author'], mention)
+                        G_dg = add_edge(G_dg, row['original_text'], row['hashtags'], row['favorite_count'],
+                                        row['retweet_count'], row['original_author'], mention, row['toxicity'])
+                        G_g = add_edge(G_g, None, None, None, None, row['original_author'], mention,
+                                       row['toxicity'])
             except:
                 print(row['user_mentions'])
 
