@@ -70,7 +70,7 @@ def nodes_management(G, option, threshold=0):
     total_edge = 0
     real_edge = 0
 
-    if option == 'remove' or 'count':
+    if option in ('remove', 'count'):
         edge_to_delete = list()
         for edge in G.edges(data=True):
             if type(G).__name__ == 'DiGraph':
@@ -126,16 +126,16 @@ def add_edge(G, tweet, hashtag, favorites, retweets, source, destination, toxici
             G[source][destination]['retweets'].append(retweets)
             G[source][destination]['weight'] += 1.0
             G[source][destination]['hashtags'].append(hashtag)
-            G[source][destination]['toxicities'].append(toxicity)
+            G[source][destination]['toxicity'].append(toxicity)
         else:
             G.add_edge(source, destination, tweets=[tweet], hashtags=[hashtag], favorites=[favorites],
                        retweets=[retweets], toxicity=[toxicity], weight=1.0)
     else:
-        if G.has_edge(source, destination, toxicity):
+        if G.has_edge(source, destination):
             G[source][destination]['weight'] += 1.0
             G[source][destination]['toxicity'] += toxicity
         else:
-            G.add_edge(source, destination, weight=1.0, toxicity=1)
+            G.add_edge(source, destination, weight=1.0, toxicity= toxicity)
     return G
 
 
@@ -150,7 +150,7 @@ def manage_and_save(graphs, path):
             name = name + '_Vax'
             suffix = '_Vax.gml'
         else:
-            threshold = 3
+            threshold = 1
             name = name + '_Covid'
             suffix = '_Covid.gml'
 

@@ -75,7 +75,6 @@ def covid_graph():
         os.mkdir(os.path.join(path, 'Graph'))
         os.chdir(os.path.join(path, 'final_data'))
         build_covid_graph(path)
-        meta = True
     if meta:
         add_meta(path)
     print('---------------------------------------')
@@ -84,7 +83,7 @@ def covid_graph():
 def build_covid_graph(path):
     df = pd.read_csv(os.path.join(path, 'final_data', 'Final_data.csv'),
                      usecols=['original_author', 'favorite_count', 'retweet_count', 'user_mentions', 'original_text',
-                              'hashtags', 'source', 'toxicity', 'vader_compound'])
+                              'hashtags', 'toxicity', 'vader_compound'])
     print(df.columns)
     df.dropna(axis='index', how='all', subset=['original_text'], inplace=True)
 
@@ -92,9 +91,9 @@ def build_covid_graph(path):
     G_g = nx.Graph()
 
     for _, row in tqdm(df.iterrows(), desc="Rows processed"):
-        if row['user_mentions'] == "['self']" or row['user_mentions'] == '':
+        if row['user_mentions'] == "['self']" or row['user_mentions'] == '' or pd.isna(row['user_mentions']):
             G_dg = add_edge(G_dg, row['original_text'], row['hashtags'], row['favorite_count'], row['retweet_count'],
-                            row['original_python'], row['original_author'], row['toxicity'])
+                            row['original_author'], row['original_author'], row['toxicity'])
         else:
             try:
                 mentions = row['user_mentions'].split(',')
