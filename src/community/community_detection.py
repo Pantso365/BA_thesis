@@ -48,12 +48,12 @@ def covid_graph():
 
     # Community detection with the correct weights
     info_no_sent_metis, info_no_sent_fluid = community_detection('Covid', 1, 'weight')
-    info_sent_metis, info_sent_fluid = community_detection('Covid', 1, 'sentiment')
+    # info_sent_metis, info_sent_fluid = community_detection('Covid', 1, 'sentiment')
     # info_topic_metis, info_topic_fluid = community_detection('Covid', 1, 'topic')
     # info_hybrid_metis, info_hybrid_fluid = community_detection('Covid', 1, 'hybrid')
 
     # Log the difference between communities detected with and without sentiment
-    note_difference(info_no_sent_metis, info_sent_metis, 'Kernighan-Lin', 'sentiment')
+    # note_difference(info_no_sent_metis, info_sent_metis, 'Kernighan-Lin', 'sentiment')
     # note_difference(info_no_sent_metis, info_topic_metis, 'Kernighan-Lin', 'topic')
     # note_difference(info_no_sent_metis, info_hybrid_metis, 'Kernighan-Lin', 'hybrid')
 

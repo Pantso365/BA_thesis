@@ -55,7 +55,7 @@ def get_communities(G, alg, typology, seed=0):
 
     if alg == 'Louvain':
         start = time.time()
-        communities = nx.community.louvain_communities(G, weight=weight, seed=seed, resolution=1.0)
+        communities = nx.community.louvain_communities(G, weight=weight, seed=seed, resolution=0.1)
         end = time.time()
 
         # Map nodes to their community
@@ -179,7 +179,7 @@ def community_detection(name, opt, typology):
         log_write_graph_info(name, get_graph_info(graph), get_graph_info(multi))
 
     #### METIS (Replaced with Louvain)
-    list_com_metis, set_com_metis, info, exe_time = get_communities(graph, 'Kernighan-Lin', typology)
+    list_com_metis, set_com_metis, info, exe_time = get_communities(graph, 'Louvain', typology)
 
 
     partition = []
@@ -188,7 +188,7 @@ def community_detection(name, opt, typology):
     mod_m = nx.community.modularity(graph, partition)
     cov_m = partition_quality(graph, partition)[0] #extract only coverage [0] leave out performance [1]
 
-    log_write_com_result('Kernighan-Lin', info, mod_m, cov_m, exe_time, opt, typology, name)
+    log_write_com_result('Louvain', info, mod_m, cov_m, exe_time, opt, typology, name)
 
     label_node_communities(graph, list_com_metis, typology, name, opt)
     return [list_com_metis, mod_m, cov_m], [0, 0, 0]

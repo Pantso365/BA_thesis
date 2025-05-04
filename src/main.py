@@ -34,7 +34,7 @@ def community_detection():
 if __name__ == '__main__':
     # Note: This function is needed to be run only for the first time
     preprocessing_operation()
-    # community_detection()
+    community_detection()
     # visualize_covid_graph("C:/Users/panos/GitHub/echochambers/src/data/corona_virus/Graph")
     # visualize_large_garimella_graph("C:/Users/panos/GitHub/echochambers/src/data/garimella_data/Graph")
     #visualize_vaccination_graph("C:/Users/panos/GitHub/echochambers/src/data/vaccination/Graph/Final_Graph_Vax.gml")

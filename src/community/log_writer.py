@@ -39,8 +39,8 @@ def log_write_com_result(alg, info_com, mod, cov, exe_time, opt, typology, name 
 
     logging.basicConfig(filename='community_log.log', level=logging.INFO, format='%(message)s')
     logging.info(f'------{alg}{additional_info}------')
-    logging.info(f'Community 0 length: {info_com[0]}')
-    logging.info(f'Community 1 length: {info_com[1]}')
+    logging.info(f'Number of communities detected: {len(info_com)}')
+    logging.info(f'Community sizes: {info_com}')
     logging.info(f'{alg} modularity: {round(mod, 4)}')
     logging.info(f'{alg} coverage: {round(cov, 4)}')
     logging.info(f'execution time: {round(exe_time, 4)}')
