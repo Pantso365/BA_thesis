@@ -99,8 +99,13 @@ def nodes_management(G, option, threshold=0):
                 except:
                     pass
 
-            return G
+            if type(G).__name__ == 'DiGraph':
+                largest_cc = max(nx.weakly_connected_components(G), key=len)
+            else:
+                largest_cc = max(nx.connected_components(G), key=len)
 
+            G = G.subgraph(largest_cc).copy()
+            return G
         else:
             if type(G).__name__ == 'DiGraph':
                 return real_edge
@@ -120,15 +125,17 @@ def add_edge(G, tweet, hashtag, favorites, retweets, source, destination, toxici
             G[source][destination]['tweets'].append(tweet)
             G[source][destination]['favorites'].append(favorites)
             G[source][destination]['retweets'].append(retweets)
-            G[source][destination]['weight'] += 1.0
             G[source][destination]['hashtags'].append(hashtag)
             G[source][destination]['toxicity'].append(toxicity)
+            if source != destination:
+                G[source][destination]['weight'] += 1.0
         else:
             G.add_edge(source, destination, tweets=[tweet], hashtags=[hashtag], favorites=[favorites],
                        retweets=[retweets], toxicity=[toxicity], weight=1.0)
     else:
         if G.has_edge(source, destination):
-            G[source][destination]['weight'] += 1.0
+            if source != destination:
+                G[source][destination]['weight'] += 1.0
             G[source][destination]['toxicity'] += toxicity
         else:
             G.add_edge(source, destination, weight=1.0, toxicity= toxicity)
@@ -155,21 +162,14 @@ def manage_and_save(graphs, path):
         print(f"Graph Info:\n{graph}")
         print("{:<20}{:<8}".format('Real number of Edges: ', nodes_management(graph, 'count')))
 
-        degree_zero_nodes = [n for n, d in graph.degree() if d == 0]
-        print("{:<25}{:<8}".format('Nodes with degree 0: ', len(degree_zero_nodes)))
-        print("Sample nodes with degree 0:", degree_zero_nodes[:10])
-
         print()
 
         graph = nodes_management(graph, 'remove', threshold)
         graph.name = graph.name.replace('Starter', 'Final')
         print(f"Graph Info:\n{graph}")
         print("{:<20}{:<8}".format('Real number of Edges: ', nodes_management(graph, 'count')))
-
-        degree_zero_nodes = [n for n, d in graph.degree() if d == 0]
-        print("{:<25}{:<8}".format('Nodes with degree 0: ', len(degree_zero_nodes)))
-
         print()
+
         if 'Direct' not in graph.name:
             G_multi = nx.MultiGraph()
             G_multi = create_multi_graph(graph)
